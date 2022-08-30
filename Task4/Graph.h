@@ -16,6 +16,13 @@ public:
 	Graph(Graph&& AnotherGraph);
 	~Graph();
 
+	const string& GetName() const;
+	void SetName(const string NewName);
+	const int GetData() const;
+	void SetData(const int NewData);
+	const int GetNumberOfConnections() const;
+	const Graph** GetConnections() const;
+
 	const Graph& operator=(const Graph& SomeGraph);
 	const Graph& operator=(Graph&& SomeGraph);
 
@@ -25,4 +32,4 @@ public:
 	void PrintGraph();
 };
 
-const Graph& CreateGraph();
+const Graph& CreateGraph(const Graph& SomeGraph);

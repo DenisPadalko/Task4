@@ -13,11 +13,9 @@ Graph::Graph(const string& NewName, const int NewData, const int NewNumberOfConn
 {
 	Name = NewName;
 	Data = NewData;
-	NumberOfConnections = NewNumberOfConnections;
-	Connections = new Graph* [NumberOfConnections];
-	for (int i = 0; i < NumberOfConnections; ++i)
+	for (int i = 0; i < NewNumberOfConnections; ++i)
 	{
-		Connections[i] = (Graph*)NewConnections[i];
+		CreateConnection((Graph&)(*NewConnections[i]));
 	}
 	if (IsStart) Start = this;
 }
@@ -27,13 +25,11 @@ Graph::Graph(const Graph& AnotherGraph)
 	Name = "New_";
 	Name += AnotherGraph.Name;
 	Data = AnotherGraph.Data;
-	NumberOfConnections = AnotherGraph.NumberOfConnections;
-	Connections = new Graph* [NumberOfConnections];
-	for (int i = 0; i < NumberOfConnections; ++i)
+	int TempNumber = AnotherGraph.NumberOfConnections;
+	for (int i = 0; i < TempNumber; ++i)
 	{
-		Connections[i] = AnotherGraph.Connections[i];
+		CreateConnection(*(AnotherGraph.Connections[i]));
 	}
-	CreateConnection((Graph&)AnotherGraph);
 }
 
 Graph::Graph(Graph&& AnotherGraph) 
@@ -41,8 +37,12 @@ Graph::Graph(Graph&& AnotherGraph)
 	Name = AnotherGraph.Name;
 	Data = AnotherGraph.Data;
 	NumberOfConnections = AnotherGraph.NumberOfConnections;
-	Connections = AnotherGraph.Connections;
-	CreateConnection(AnotherGraph);
+	int TempNumber = NumberOfConnections;
+	for (int i = 0; i < TempNumber; ++i)
+	{
+		CreateConnection(*(AnotherGraph.Connections[i]));
+	}
+	DeleteAllConnections(AnotherGraph);
 	for (int i = 0; i < NumberOfConnections; ++i)
 	{
 		AnotherGraph.Connections[i] = nullptr;
@@ -65,6 +65,36 @@ Graph::~Graph()
 	cout << "Graph element \"" << Name << "\" was successfully deleted" << endl;
 }
 
+const string& Graph::GetName() const
+{
+	return Name;
+}
+
+void Graph::SetName(const string NewName) 
+{
+	Name = NewName;
+}
+
+const int Graph::GetData() const
+{
+	return Data;
+}
+
+void Graph::SetData(const int NewData) 
+{
+	Data = NewData;
+}
+
+const int Graph::GetNumberOfConnections() const
+{
+	return NumberOfConnections;
+}
+
+const Graph** Graph::GetConnections() const
+{
+	return (const Graph**)Connections;
+}
+
 const Graph& Graph::operator=(const Graph& SomeGraph) 
 {
 	if (&SomeGraph == this) return *this;
@@ -80,11 +110,10 @@ const Graph& Graph::operator=(const Graph& SomeGraph)
 	}
 	Name = SomeGraph.Name;
 	Data = SomeGraph.Data;
-	NumberOfConnections = SomeGraph.NumberOfConnections;
-	Connections = new Graph* [NumberOfConnections];
-	for (int i = 0; i < NumberOfConnections; ++i)
+	int TempNumber = SomeGraph.NumberOfConnections;
+	for (int i = 0; i < TempNumber; ++i)
 	{
-		Connections[i] = SomeGraph.Connections[i];
+		CreateConnection(*SomeGraph.Connections[i]);
 	}
 	CreateConnection((Graph&)SomeGraph);
 	return *this;
@@ -106,7 +135,11 @@ const Graph& Graph::operator=(Graph&& SomeGraph)
 	Name = SomeGraph.Name;
 	Data = SomeGraph.Data;
 	NumberOfConnections = SomeGraph.NumberOfConnections;
-	Connections = SomeGraph.Connections;
+	int TempNumber = NumberOfConnections;
+	for (int i = 0; i < TempNumber; ++i)
+	{
+		CreateConnection(*SomeGraph.Connections[i]);
+	}
 	for (int i = 0; i < NumberOfConnections; ++i)
 	{
 		SomeGraph.Connections[i] = nullptr;
@@ -120,6 +153,11 @@ const Graph& Graph::operator=(Graph&& SomeGraph)
 
 void Graph::CreateConnection(Graph& SomeGraph) 
 {
+	if (this == &SomeGraph)
+	{
+		cout << "Connection between same graph elements cannot be created" << endl;
+		return;
+	}
 	for (int i = 0; i < NumberOfConnections; ++i)
 	{
 		if (Connections[i] == &SomeGraph) 
@@ -251,8 +289,8 @@ void Graph::PrintGraph()
 	cout << "Number of connections: " << NumberOfConnections << endl;
 }
 
-const Graph& CreateGraph()
+const Graph& CreateGraph(const Graph& SomeGraph)
 {
-	Graph* G = new Graph();
+	Graph* G = new Graph(SomeGraph.GetName(), SomeGraph.GetData(), SomeGraph.GetNumberOfConnections(), SomeGraph.GetConnections(), false);
 	return *G;
 }
