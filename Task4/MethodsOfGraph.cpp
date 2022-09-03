@@ -28,7 +28,7 @@ Graph::Graph(const Graph& AnotherGraph)
 	int TempNumber = AnotherGraph.NumberOfConnections;
 	for (int i = 0; i < TempNumber; ++i)
 	{
-		CreateConnection(*(AnotherGraph.Connections[i]));
+		CreateConnection(*AnotherGraph.Connections[i]);
 	}
 }
 
@@ -36,11 +36,11 @@ Graph::Graph(Graph&& AnotherGraph)
 {
 	Name = AnotherGraph.Name;
 	Data = AnotherGraph.Data;
-	NumberOfConnections = AnotherGraph.NumberOfConnections;
-	int TempNumber = NumberOfConnections;
+	NumberOfConnections = 0;
+	int TempNumber = AnotherGraph.NumberOfConnections;
 	for (int i = 0; i < TempNumber; ++i)
 	{
-		CreateConnection(*(AnotherGraph.Connections[i]));
+		CreateConnection(*AnotherGraph.Connections[i]);
 	}
 	DeleteAllConnections(AnotherGraph);
 	for (int i = 0; i < NumberOfConnections; ++i)
@@ -134,12 +134,12 @@ const Graph& Graph::operator=(Graph&& SomeGraph)
 	}
 	Name = SomeGraph.Name;
 	Data = SomeGraph.Data;
-	NumberOfConnections = SomeGraph.NumberOfConnections;
-	int TempNumber = NumberOfConnections;
+	int TempNumber = SomeGraph.NumberOfConnections;
 	for (int i = 0; i < TempNumber; ++i)
 	{
 		CreateConnection(*SomeGraph.Connections[i]);
 	}
+	DeleteAllConnections(SomeGraph);
 	for (int i = 0; i < NumberOfConnections; ++i)
 	{
 		SomeGraph.Connections[i] = nullptr;
@@ -287,10 +287,4 @@ void Graph::PrintGraph()
 	cout << "Name: " << Name << endl;
 	cout << "Data: " << Data << endl;
 	cout << "Number of connections: " << NumberOfConnections << endl;
-}
-
-const Graph& CreateGraph(const Graph& SomeGraph)
-{
-	Graph* G = new Graph(SomeGraph.GetName(), SomeGraph.GetData(), SomeGraph.GetNumberOfConnections(), SomeGraph.GetConnections(), false);
-	return *G;
 }

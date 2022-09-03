@@ -18,16 +18,10 @@ int main()
 	C = B;
 	C.SetName("C");
 	C.PrintGraph();
-	B.PrintGraph();
-	cout << endl << "Deleting A" << endl;
+	cout << endl << "Deleting A" << endl << endl;
 	A.~Graph();
 	cout << endl << "Creating A and moving C to A" << endl << endl;
-	A = CreateGraph(C);
-	A.SetName("A");
-	B.SetName("B");
-	C.SetName("C");
+	A = move(C);
 	A.PrintGraph();
-	B.PrintGraph();
-	C.PrintGraph();
 	return 0;
 }

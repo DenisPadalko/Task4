@@ -31,5 +31,3 @@ public:
 	void DeleteAllConnections(Graph& G);
 	void PrintGraph();
 };
-
-const Graph& CreateGraph(const Graph& SomeGraph);
