@@ -22,6 +22,7 @@ int main()
 	A.~Graph();
 	cout << endl << "Creating A and moving C to A" << endl << endl;
 	A = move(C);
+	A.SetName("A");
 	A.PrintGraph();
 	return 0;
 }

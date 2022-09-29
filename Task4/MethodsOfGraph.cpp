@@ -45,10 +45,9 @@ Graph::Graph(Graph&& AnotherGraph)
 	DeleteAllConnections(AnotherGraph);
 	for (int i = 0; i < NumberOfConnections; ++i)
 	{
-		AnotherGraph.Connections[i] = nullptr;
 		delete AnotherGraph.Connections[i];
 	}
-	AnotherGraph.Connections = nullptr;
+	AnotherGraph.Data = 0;
 	delete[] AnotherGraph.Connections;
 }
 
@@ -59,8 +58,6 @@ Graph::~Graph()
 	{
 		DeleteAllConnections(*this);
 	}
-	Connections = nullptr;
-	delete[] Connections;
 	Data = 0;
 	cout << "Graph element \"" << Name << "\" was successfully deleted" << endl;
 }
@@ -102,10 +99,8 @@ const Graph& Graph::operator=(const Graph& SomeGraph)
 	{
 		for (int i = 0; i < NumberOfConnections; ++i)
 		{
-			Connections[i] = nullptr;
 			delete Connections[i];
 		}
-		Connections = nullptr;
 		delete[] Connections;
 	}
 	Name = SomeGraph.Name;
@@ -126,10 +121,9 @@ const Graph& Graph::operator=(Graph&& SomeGraph)
 	{
 		for (int i = 0; i < NumberOfConnections; ++i)
 		{
-			Connections[i] = nullptr;
 			delete Connections[i];
+			//Connections[i] = nullptr;
 		}
-		Connections = nullptr;
 		delete[] Connections;
 	}
 	Name = SomeGraph.Name;
@@ -140,14 +134,8 @@ const Graph& Graph::operator=(Graph&& SomeGraph)
 		CreateConnection(*SomeGraph.Connections[i]);
 	}
 	DeleteAllConnections(SomeGraph);
-	for (int i = 0; i < NumberOfConnections; ++i)
-	{
-		SomeGraph.Connections[i] = nullptr;
-		delete SomeGraph.Connections[i];
-	}
-	SomeGraph.Connections = nullptr;
 	delete[] SomeGraph.Connections;
-
+	SomeGraph.Data = 0;
 	return *this;
 }
 
@@ -171,19 +159,15 @@ void Graph::CreateConnection(Graph& SomeGraph)
 	{
 		TempConnections[i] = Connections[i];
 		Connections[i] = nullptr;
-		delete Connections[i];
 	}
-	Connections = nullptr;
 	delete[] Connections;
 	++NumberOfConnections;
 	Connections = new Graph* [NumberOfConnections];
-	for (int i = 0; i < NumberOfConnections; ++i)
+	for (int i = 0; i < NumberOfConnections - 1; ++i)
 	{
 		Connections[i] = TempConnections[i];
 		TempConnections[i] = nullptr;
-		delete TempConnections[i];
 	}
-	TempConnections = nullptr;
 	delete[] TempConnections;
 	Connections[NumberOfConnections - 1] = &SomeGraph;
 	TempConnections = new Graph* [SomeGraph.NumberOfConnections];
@@ -191,19 +175,15 @@ void Graph::CreateConnection(Graph& SomeGraph)
 	{
 		TempConnections[i] = SomeGraph.Connections[i];
 		SomeGraph.Connections[i] = nullptr;
-		delete SomeGraph.Connections[i];
 	}
-	SomeGraph.Connections = nullptr;
 	delete[] SomeGraph.Connections;
 	++SomeGraph.NumberOfConnections;
 	SomeGraph.Connections = new Graph* [SomeGraph.NumberOfConnections];
-	for (int i = 0; i < SomeGraph.NumberOfConnections; ++i)
+	for (int i = 0; i < SomeGraph.NumberOfConnections - 1; ++i)
 	{
 		SomeGraph.Connections[i] = TempConnections[i];
 		TempConnections[i] = nullptr;
-		delete TempConnections[i];
 	}
-	TempConnections = nullptr;
 	delete[] TempConnections;
 	SomeGraph.Connections[SomeGraph.NumberOfConnections - 1] = this;
 }
@@ -225,7 +205,6 @@ void Graph::DeleteConnection(Graph& SomeGraph)
 	{
 		TempConnections[i] = Connections[i];
 		Connections[i] = nullptr;
-		delete Connections[i];
 	}
 	delete[] Connections;
 	--NumberOfConnections;
@@ -239,9 +218,7 @@ void Graph::DeleteConnection(Graph& SomeGraph)
 			++j;
 		}
 		TempConnections[i] = nullptr;
-		delete TempConnections[i];
 	}
-	TempConnections = nullptr;
 	delete[] TempConnections;
 
 	TempConnections = new Graph * [SomeGraph.NumberOfConnections];
@@ -249,7 +226,6 @@ void Graph::DeleteConnection(Graph& SomeGraph)
 	{
 		TempConnections[i] = SomeGraph.Connections[i];
 		SomeGraph.Connections[i] = nullptr;
-		delete SomeGraph.Connections[i];
 	}
 	delete[] SomeGraph.Connections;
 	--SomeGraph.NumberOfConnections;
@@ -263,9 +239,7 @@ void Graph::DeleteConnection(Graph& SomeGraph)
 			++j;
 		}
 		TempConnections[i] = nullptr;
-		delete TempConnections[i];
 	}
-	TempConnections = nullptr;
 	delete[] TempConnections;
 }
 
