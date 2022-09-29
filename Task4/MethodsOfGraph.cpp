@@ -45,7 +45,7 @@ Graph::Graph(Graph&& AnotherGraph)
 	DeleteAllConnections(AnotherGraph);
 	for (int i = 0; i < NumberOfConnections; ++i)
 	{
-		delete AnotherGraph.Connections[i];
+		AnotherGraph.Connections[i] = nullptr;
 	}
 	AnotherGraph.Data = 0;
 	delete[] AnotherGraph.Connections;
@@ -99,7 +99,7 @@ const Graph& Graph::operator=(const Graph& SomeGraph)
 	{
 		for (int i = 0; i < NumberOfConnections; ++i)
 		{
-			delete Connections[i];
+			Connections[i] = nullptr;
 		}
 		delete[] Connections;
 	}
@@ -121,8 +121,7 @@ const Graph& Graph::operator=(Graph&& SomeGraph)
 	{
 		for (int i = 0; i < NumberOfConnections; ++i)
 		{
-			delete Connections[i];
-			//Connections[i] = nullptr;
+			Connections[i] = nullptr;
 		}
 		delete[] Connections;
 	}
