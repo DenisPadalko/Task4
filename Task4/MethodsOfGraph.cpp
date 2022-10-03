@@ -1,45 +1,42 @@
 #include "Graph.h"
 
 Graph* Start;
-Graph::Graph() : Name("Somegraph"), Data(1234), NumberOfConnections(0)
+Graph::Graph() : Name("Somegraph"), Data(1234), NumberOfConnections(0), Capacity(0)
 {
 	Start = this;
 }
 
-Graph::Graph(const string& NewName, const int NewData, const int NewNumberOfConnections, const Graph** NewConnections, const bool IsStart) : Name(NewName), Data(NewData)
+Graph::Graph(const string& NewName, const int NewData, const size_t NewNumberOfConnections, const Graph** NewConnections, const bool IsStart) : Name(NewName), Data(NewData)
 {
-	for (int i = 0; i < NewNumberOfConnections; ++i)
+	for (size_t i = 0; i < NewNumberOfConnections; ++i)
 	{
 		CreateConnection((Graph&)(*NewConnections[i]));
 	}
 	if (IsStart) Start = this;
 }
 
-Graph::Graph(const Graph& AnotherGraph) : Name("New_" + AnotherGraph.Name), Data(AnotherGraph.Data)
+Graph::Graph(const Graph& AnotherGraph) : Name("New_" + AnotherGraph.Name), Data(AnotherGraph.Data), NumberOfConnections(0), Capacity(0)
 {
-	int TempNumber = AnotherGraph.NumberOfConnections;
-	for (int i = 0; i < TempNumber; ++i)
+	for (size_t i = 0; i < AnotherGraph.NumberOfConnections; ++i)
 	{
 		CreateConnection(*AnotherGraph.Connections[i]);
 	}
 }
 
-Graph::Graph(Graph&& AnotherGraph) : Name(AnotherGraph.Name), Data(AnotherGraph.Data), NumberOfConnections(0)
+Graph::Graph(Graph&& AnotherGraph) : Name(AnotherGraph.Name), Data(AnotherGraph.Data), NumberOfConnections(0), Capacity(0)
 {
-	int TempNumber = AnotherGraph.NumberOfConnections;
-	for (int i = 0; i < TempNumber; ++i)
+	for (size_t i = 0; i < AnotherGraph.NumberOfConnections; ++i)
 	{
 		CreateConnection(*AnotherGraph.Connections[i]);
 	}
 	DeleteAllConnections(AnotherGraph);
 	AnotherGraph.Data = 0;
-	delete[] AnotherGraph.Connections;
 }
 
 Graph::~Graph() 
 {
 	if ((this == Start) && (Connections != nullptr)) Start = Connections[0];
-	if (Connections)
+	if (NumberOfConnections)
 	{
 		DeleteAllConnections(*this);
 	}
@@ -67,7 +64,7 @@ void Graph::SetData(const int NewData)
 	Data = NewData;
 }
 
-const int Graph::GetNumberOfConnections() const
+const size_t Graph::GetNumberOfConnections() const
 {
 	return NumberOfConnections;
 }
@@ -80,9 +77,9 @@ const Graph** Graph::GetConnections() const
 const Graph& Graph::operator=(const Graph& SomeGraph) 
 {
 	if (&SomeGraph == this) return *this;
-	if (Connections) 
+	if (NumberOfConnections) 
 	{
-		for (int i = 0; i < NumberOfConnections; ++i)
+		for (size_t i = 0; i < NumberOfConnections; ++i)
 		{
 			Connections[i] = nullptr;
 		}
@@ -90,8 +87,8 @@ const Graph& Graph::operator=(const Graph& SomeGraph)
 	}
 	Name = SomeGraph.Name;
 	Data = SomeGraph.Data;
-	int TempNumber = SomeGraph.NumberOfConnections;
-	for (int i = 0; i < TempNumber; ++i)
+	Capacity = 0;
+	for (size_t i = 0; i < SomeGraph.NumberOfConnections; ++i)
 	{
 		CreateConnection(*SomeGraph.Connections[i]);
 	}
@@ -102,9 +99,9 @@ const Graph& Graph::operator=(const Graph& SomeGraph)
 const Graph& Graph::operator=(Graph&& SomeGraph)
 {
 	if (&SomeGraph == this) return *this;
-	if (Connections)
+	if (NumberOfConnections)
 	{
-		for (int i = 0; i < NumberOfConnections; ++i)
+		for (size_t i = 0; i < NumberOfConnections; ++i)
 		{
 			Connections[i] = nullptr;
 		}
@@ -112,13 +109,12 @@ const Graph& Graph::operator=(Graph&& SomeGraph)
 	}
 	Name = SomeGraph.Name;
 	Data = SomeGraph.Data;
-	int TempNumber = SomeGraph.NumberOfConnections;
-	for (int i = 0; i < TempNumber; ++i)
+	Capacity = 0;
+	for (size_t i = 0; i < SomeGraph.NumberOfConnections; ++i)
 	{
 		CreateConnection(*SomeGraph.Connections[i]);
 	}
 	DeleteAllConnections(SomeGraph);
-	delete[] SomeGraph.Connections;
 	SomeGraph.Data = 0;
 	return *this;
 }
@@ -130,7 +126,7 @@ void Graph::CreateConnection(Graph& SomeGraph)
 		cout << "Connection between same graph elements cannot be created" << endl;
 		return;
 	}
-	for (int i = 0; i < NumberOfConnections; ++i)
+	for (size_t i = 0; i < NumberOfConnections; ++i)
 	{
 		if (Connections[i] == &SomeGraph) 
 		{
@@ -138,44 +134,16 @@ void Graph::CreateConnection(Graph& SomeGraph)
 			return; 
 		}
 	}
-	Graph** TempConnections = new Graph* [NumberOfConnections];
-	for (int i = 0; i < NumberOfConnections; ++i)
-	{
-		TempConnections[i] = Connections[i];
-		Connections[i] = nullptr;
-	}
-	delete[] Connections;
-	++NumberOfConnections;
-	Connections = new Graph* [NumberOfConnections];
-	for (int i = 0; i < NumberOfConnections - 1; ++i)
-	{
-		Connections[i] = TempConnections[i];
-		TempConnections[i] = nullptr;
-	}
-	delete[] TempConnections;
-	Connections[NumberOfConnections - 1] = &SomeGraph;
-	TempConnections = new Graph* [SomeGraph.NumberOfConnections];
-	for (int i = 0; i < SomeGraph.NumberOfConnections; ++i)
-	{
-		TempConnections[i] = SomeGraph.Connections[i];
-		SomeGraph.Connections[i] = nullptr;
-	}
-	delete[] SomeGraph.Connections;
-	++SomeGraph.NumberOfConnections;
-	SomeGraph.Connections = new Graph* [SomeGraph.NumberOfConnections];
-	for (int i = 0; i < SomeGraph.NumberOfConnections - 1; ++i)
-	{
-		SomeGraph.Connections[i] = TempConnections[i];
-		TempConnections[i] = nullptr;
-	}
-	delete[] TempConnections;
-	SomeGraph.Connections[SomeGraph.NumberOfConnections - 1] = this;
+	if ((NumberOfConnections + 1 > Capacity) || (Capacity == 0)) this->ReAlloc();
+	Connections[NumberOfConnections++] = &SomeGraph;
+	if ((SomeGraph.NumberOfConnections + 1 > Capacity) || (SomeGraph.Capacity == 0)) SomeGraph.ReAlloc();
+	SomeGraph.Connections[SomeGraph.NumberOfConnections++] = this;
 }
 
 void Graph::DeleteConnection(Graph& SomeGraph) 
 {
 	bool Flag = false;
-	for (int i = 0; i < NumberOfConnections; ++i)
+	for (size_t i = 0; i < NumberOfConnections; ++i)
 	{
 		if (Connections[i] == &SomeGraph) Flag = true;
 	}
@@ -184,59 +152,38 @@ void Graph::DeleteConnection(Graph& SomeGraph)
 		cout << "There is no connection between graph elements \"" << Name << "\" and \"" << SomeGraph.Name << "\"" << endl;
 		return; 
 	}
-	Graph** TempConnections = new Graph* [NumberOfConnections];
-	for (int i = 0; i < NumberOfConnections; ++i)
+	size_t j = 0;
+	for (size_t i = 0; i < NumberOfConnections; ++i)
 	{
-		TempConnections[i] = Connections[i];
-		Connections[i] = nullptr;
+		if (Connections[i] == &SomeGraph) j = i;
 	}
-	delete[] Connections;
+	for (size_t i = j; i < NumberOfConnections; ++i)
+	{
+		if (i + 1 < NumberOfConnections) Connections[i] = Connections[i + 1];
+		else Connections[i] = nullptr;
+	}
 	--NumberOfConnections;
-	Connections = new Graph* [NumberOfConnections];
-	int j = 0;
-	for (int i = 0; i <= NumberOfConnections; ++i)
+	for (size_t i = 0; i < SomeGraph.NumberOfConnections; ++i)
 	{
-		if (TempConnections[i] != &SomeGraph) 
-		{
-			Connections[j] = TempConnections[i];
-			++j;
-		}
-		TempConnections[i] = nullptr;
+		if (SomeGraph.Connections[i] == this) j = i;
 	}
-	delete[] TempConnections;
-
-	TempConnections = new Graph * [SomeGraph.NumberOfConnections];
-	for (int i = 0; i < SomeGraph.NumberOfConnections; ++i)
+	for (size_t i = j; i < SomeGraph.NumberOfConnections; ++i)
 	{
-		TempConnections[i] = SomeGraph.Connections[i];
-		SomeGraph.Connections[i] = nullptr;
+		if (i + 1 < SomeGraph.NumberOfConnections) SomeGraph.Connections[i] = SomeGraph.Connections[i + 1];
+		else SomeGraph.Connections[i] = nullptr;
 	}
-	delete[] SomeGraph.Connections;
 	--SomeGraph.NumberOfConnections;
-	SomeGraph.Connections = new Graph * [SomeGraph.NumberOfConnections];
-	j = 0;
-	for (int i = 0; i <= SomeGraph.NumberOfConnections; ++i)
-	{
-		if (TempConnections[i] != this)
-		{
-			SomeGraph.Connections[j] = TempConnections[i];
-			++j;
-		}
-		TempConnections[i] = nullptr;
-	}
-	delete[] TempConnections;
 }
 
 
 void Graph::DeleteAllConnections(Graph& G)
 {
 	if (G.NumberOfConnections == 0) return;
-	Graph* Temp;
 	while (G.NumberOfConnections > 0)
 	{
-		Temp = G.Connections[0];
-		G.DeleteConnection(*Temp);
+		G.DeleteConnection(*G.Connections[0]);
 	}
+	G.Capacity = 0;
 }
 
 void Graph::PrintGraph() 
@@ -245,4 +192,21 @@ void Graph::PrintGraph()
 	cout << "Name: " << Name << endl;
 	cout << "Data: " << Data << endl;
 	cout << "Number of connections: " << NumberOfConnections << endl;
+}
+
+void Graph::ReAlloc()
+{
+	if (Capacity == 0) ++Capacity;
+	else 
+	{
+	Capacity = Capacity + Capacity / 2;
+	}
+	Graph** NewConnections = new Graph * [Capacity];
+	for (size_t i = 0; i < NumberOfConnections; ++i)
+	{
+		NewConnections[i] = Connections[i];
+		Connections[i] = nullptr;
+	}
+	delete[] Connections;
+	Connections = NewConnections;
 }

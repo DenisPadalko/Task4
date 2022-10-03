@@ -7,11 +7,13 @@ class Graph
 private:
 	string Name;
 	int Data;
-	int NumberOfConnections;
+	size_t NumberOfConnections;
+	size_t Capacity;
 	Graph** Connections = nullptr;
+	void ReAlloc();
 public:
 	Graph();
-	Graph(const string& NewName, const int NewData, const int NewNumberOfConnections, const Graph** NewConnections, const bool IsStart);
+	Graph(const string& NewName, const int NewData, const size_t NewNumberOfConnections, const Graph** NewConnections, const bool IsStart);
 	Graph(const Graph& AnotherGraph);
 	Graph(Graph&& AnotherGraph);
 	~Graph();
@@ -20,7 +22,7 @@ public:
 	void SetName(const string NewName);
 	const int GetData() const;
 	void SetData(const int NewData);
-	const int GetNumberOfConnections() const;
+	const size_t GetNumberOfConnections() const;
 	const Graph** GetConnections() const;
 
 	const Graph& operator=(const Graph& SomeGraph);
