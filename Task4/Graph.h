@@ -8,7 +8,7 @@ private:
 	string Name;
 	int Data;
 	int NumberOfConnections;
-	Graph** Connections;
+	Graph** Connections = nullptr;
 public:
 	Graph();
 	Graph(const string& NewName, const int NewData, const int NewNumberOfConnections, const Graph** NewConnections, const bool IsStart);

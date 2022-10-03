@@ -1,18 +1,13 @@
 #include "Graph.h"
 
 Graph* Start;
-Graph::Graph() 
+Graph::Graph() : Name("Somegraph"), Data(1234), NumberOfConnections(0)
 {
-	Name = "SomeGraph";
-	Data = 1234;
-	NumberOfConnections = 0;
 	Start = this;
 }
 
-Graph::Graph(const string& NewName, const int NewData, const int NewNumberOfConnections, const Graph** NewConnections, const bool IsStart)
+Graph::Graph(const string& NewName, const int NewData, const int NewNumberOfConnections, const Graph** NewConnections, const bool IsStart) : Name(NewName), Data(NewData)
 {
-	Name = NewName;
-	Data = NewData;
 	for (int i = 0; i < NewNumberOfConnections; ++i)
 	{
 		CreateConnection((Graph&)(*NewConnections[i]));
@@ -20,11 +15,8 @@ Graph::Graph(const string& NewName, const int NewData, const int NewNumberOfConn
 	if (IsStart) Start = this;
 }
 
-Graph::Graph(const Graph& AnotherGraph) 
+Graph::Graph(const Graph& AnotherGraph) : Name("New_" + AnotherGraph.Name), Data(AnotherGraph.Data)
 {
-	Name = "New_";
-	Name += AnotherGraph.Name;
-	Data = AnotherGraph.Data;
 	int TempNumber = AnotherGraph.NumberOfConnections;
 	for (int i = 0; i < TempNumber; ++i)
 	{
@@ -32,21 +24,14 @@ Graph::Graph(const Graph& AnotherGraph)
 	}
 }
 
-Graph::Graph(Graph&& AnotherGraph) 
+Graph::Graph(Graph&& AnotherGraph) : Name(AnotherGraph.Name), Data(AnotherGraph.Data), NumberOfConnections(0)
 {
-	Name = AnotherGraph.Name;
-	Data = AnotherGraph.Data;
-	NumberOfConnections = 0;
 	int TempNumber = AnotherGraph.NumberOfConnections;
 	for (int i = 0; i < TempNumber; ++i)
 	{
 		CreateConnection(*AnotherGraph.Connections[i]);
 	}
 	DeleteAllConnections(AnotherGraph);
-	for (int i = 0; i < NumberOfConnections; ++i)
-	{
-		AnotherGraph.Connections[i] = nullptr;
-	}
 	AnotherGraph.Data = 0;
 	delete[] AnotherGraph.Connections;
 }
