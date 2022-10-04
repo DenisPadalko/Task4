@@ -172,8 +172,8 @@ void Graph::DeleteConnection(Graph& SomeGraph)
 		else SomeGraph.Connections[i] = nullptr;
 	}
 	--SomeGraph.NumberOfConnections;
-	if (!NumberOfConnections) this->~Graph();
-	if (!SomeGraph.NumberOfConnections) SomeGraph.~Graph();
+	if ((!NumberOfConnections) && (Start != this)) this->~Graph();
+	if ((!SomeGraph.NumberOfConnections) && (Start != &SomeGraph)) SomeGraph.~Graph();
 }
 
 
