@@ -30,7 +30,7 @@ Graph::Graph(Graph&& AnotherGraph) : Name(AnotherGraph.Name), Data(AnotherGraph.
 		CreateConnection(*AnotherGraph.Connections[i]);
 	}
 	DeleteAllConnections(AnotherGraph);
-	AnotherGraph.Data = 0;
+	AnotherGraph.~Graph();
 }
 
 Graph::~Graph() 
@@ -92,7 +92,6 @@ const Graph& Graph::operator=(const Graph& SomeGraph)
 	{
 		CreateConnection(*SomeGraph.Connections[i]);
 	}
-	CreateConnection((Graph&)SomeGraph);
 	return *this;
 }
 
@@ -173,6 +172,8 @@ void Graph::DeleteConnection(Graph& SomeGraph)
 		else SomeGraph.Connections[i] = nullptr;
 	}
 	--SomeGraph.NumberOfConnections;
+	if (!NumberOfConnections) this->~Graph();
+	if (!SomeGraph.NumberOfConnections) SomeGraph.~Graph();
 }
 
 
@@ -196,7 +197,7 @@ void Graph::PrintGraph()
 
 void Graph::ReAlloc()
 {
-	if (Capacity == 0) ++Capacity;
+	if (Capacity < 2) ++Capacity;
 	else 
 	{
 	Capacity = Capacity + Capacity / 2;
